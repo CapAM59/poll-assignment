@@ -1,16 +1,25 @@
 # PollAssignment
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.15.
+Design your poll and let users answer it. 
 
 ## Development server
 
-To start a local development server, run:
+To start a local development server of PollAssigmnent, run:
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Once the server is running, open your browser and navigate to :
+- `http://localhost:4200/`
+
+The application will automatically reload whenever you modify any of the source files.
+
+# Stack
+
+- Angular v^19.2.0 : https://v19.angular.dev/overview
+- PrimeNG v^19.1.4 : https://www.npmjs.com/package/primeng and https://v19.primeng.org/
+- idb v^8.0.3 : https://www.npmjs.com/package/idb
 
 ## Code scaffolding
 
