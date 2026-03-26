@@ -46,37 +46,37 @@ The application will automatically reload whenever you modify any of the source 
 
 Database is stored in IndexedDB thanks to **idb wrapper**. Here its schema:
 
-![databaseSchema](.\public\documentation\assets\databaseSchema.webp)
+![databaseSchema](public/documentation/assets/databaseSchema.webp)
 
 ## 3.2. 🗃️ Entities
 
 There are 5 entities :
 
 ### 3.2.1. 🎭 Role
-- id: number;
+- 🗝️ id: number;
 - label: string;
 
 ### 3.2.2. 👤 User
-- id: number;
+- 🗝️ id: number;
 - name: string;
-- roleid: number;
+- 🗝️👽 roleid: number;
 
 ### 3.2.3. 📝 Poll
-- id: number;
+- 🗝️ id: number;
 - title: string;
-- userid: number;
+- 🗝️👽 userid: number;
 
 ### 3.2.4. ❓ Question
-- id: number;
+- 🗝️ id: number;
 - title: string;
-- pollid: number;
+- 🗝️👽 pollid: number;
 
 ### 3.2.5. 💬 Answer
-- id: number; 
+- 🗝️ id: number; 
 - vote: boolean; 
 - timestamp: Date; 
-- questionid: number; 
-- userid: number;
+- 🗝️👽 questionid: number; 
+- 🗝️👽 userid: number;
 
 ## 3.3. Building
 

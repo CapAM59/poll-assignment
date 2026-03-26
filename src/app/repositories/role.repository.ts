@@ -1,9 +1,17 @@
 import { Injectable } from '@angular/core';
-import { dbPromise } from '../db/app.db';
 import { Role } from '../models/role.model';
+import { dbPromise } from '../db/app.db';
 
 @Injectable({ providedIn: 'root' })
 export class RoleRepository {
+
+  async create(input: Omit<Role, 'id'>): Promise<number> {
+    const db = await dbPromise;
+    // Store has autoIncrement enabled, so we add without explicit id.
+    const key = await db.add('role', input as Role);
+    return key;
+  }
+
   async getAll(): Promise<Role[]> {
     const db = await dbPromise;
     return db.getAll('role');
@@ -14,18 +22,10 @@ export class RoleRepository {
     return db.get('role', id);
   }
 
-  async create(label: string): Promise<number> {
-    const db = await dbPromise;
-
-    // Le store est en autoIncrement, donc on ajoute sans id explicite.
-    const key = await db.add('role', { label } as Role);
-    return key as number;
-  }
-
   async update(role: Role): Promise<number> {
     const db = await dbPromise;
     const key = await db.put('role', role);
-    return key as number;
+    return key;
   }
 
   async delete(id: number): Promise<void> {

@@ -2,6 +2,6 @@ export interface Answer {
     id: number;
     vote: boolean;
     timestamp: Date;
-    questionid: number;
-    userid: number;
+    questionId: number;
+    userId: number;
 }
