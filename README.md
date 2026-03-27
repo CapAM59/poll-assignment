@@ -3,16 +3,19 @@
 - [2. 🛠️ Stack](#2-️-stack)
 - [3. 🛢️ Database](#3-️-database)
   - [3.1. 🗺️ Schema](#31-️-schema)
-  - [3.2. 🗃️ Entities](#32-️-entities)
-    - [3.2.1. 🎭 Role](#321--role)
-    - [3.2.2. 👤 User](#322--user)
-    - [3.2.3. 📝 Poll](#323--poll)
-    - [3.2.4. ❓ Question](#324--question)
-    - [3.2.5. 💬 Answer](#325--answer)
-  - [3.3. Building](#33-building)
-  - [3.4. Running unit tests](#34-running-unit-tests)
-  - [3.5. Running end-to-end tests](#35-running-end-to-end-tests)
-  - [3.6. Additional Resources](#36-additional-resources)
+  - [3.2. 🌱 Seed Initialization](#32--seed-initialization)
+    - [How It Works](#how-it-works)
+    - [Implementation Details](#implementation-details)
+  - [3.3. 🗃️ Entities](#33-️-entities)
+    - [3.3.1. 🎭 Role](#331--role)
+    - [3.3.2. 👤 User](#332--user)
+    - [3.3.3. 📝 Poll](#333--poll)
+    - [3.3.4. ❓ Question](#334--question)
+    - [3.3.5. 💬 Answer](#335--answer)
+  - [3.4. Building](#34-building)
+  - [3.5. Running unit tests](#35-running-unit-tests)
+  - [3.6. Running end-to-end tests](#36-running-end-to-end-tests)
+  - [3.7. Additional Resources](#37-additional-resources)
 
 
 # 1. PollAssignment
@@ -48,37 +51,60 @@ Database is stored in IndexedDB thanks to **idb wrapper**. Here its schema:
 
 ![databaseSchema](public/documentation/assets/databaseSchema.webp)
 
-## 3.2. 🗃️ Entities
+## 3.2. 🌱 Seed Initialization
+
+When the application starts, a **seed service** automatically initializes the database with default roles if they don't already exist. This ensures the database is always in a valid state for the application to operate.
+
+### How It Works
+
+1. **Idempotent Initialization**: The seed runs only once per unique role. If a role with the same label already exists in the database, it is skipped.
+
+2. **Default Roles**: Two default roles are automatically created on first run:
+   - **Admin**: Administrator role with full permissions
+   - **User**: Standard user role with limited permissions
+
+3. **Startup Integration**: The seed is executed during Angular application bootstrap via `provideAppInitializer()`. This ensures all required data exists before any component interacts with the database.
+
+4. **Error Handling**: If role creation fails, the error is logged but does not prevent the application from starting. Users can manually reseed the database if needed.
+
+### Implementation Details
+
+- **Service**: [`src/app/db/seed/seed.service.ts`](src/app/db/seed/seed.service.ts)
+- **Seed Data**: [`src/app/db/seed/default-roles.seed.ts`](src/app/db/seed/default-roles.seed.ts)
+- **Configuration**: Integrated in [`src/app/app.config.ts`](src/app/app.config.ts)
+- **Tests**: Comprehensive unit tests in [`src/app/db/seed/seed.service.spec.ts`](src/app/db/seed/seed.service.spec.ts)
+
+## 3.3. 🗃️ Entities
 
 There are 5 entities :
 
-### 3.2.1. 🎭 Role
+### 3.3.1. 🎭 Role
 - 🗝️ id: number;
 - label: string;
 
-### 3.2.2. 👤 User
+### 3.3.2. 👤 User
 - 🗝️ id: number;
 - name: string;
 - 🗝️👽 roleid: number;
 
-### 3.2.3. 📝 Poll
+### 3.3.3. 📝 Poll
 - 🗝️ id: number;
 - title: string;
 - 🗝️👽 userid: number;
 
-### 3.2.4. ❓ Question
+### 3.3.4. ❓ Question
 - 🗝️ id: number;
 - title: string;
 - 🗝️👽 pollid: number;
 
-### 3.2.5. 💬 Answer
+### 3.3.5. 💬 Answer
 - 🗝️ id: number; 
 - vote: boolean; 
 - timestamp: Date; 
 - 🗝️👽 questionid: number; 
 - 🗝️👽 userid: number;
 
-## 3.3. Building
+## 3.4. Building
 
 To build the project run:
 
@@ -88,7 +114,7 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
-## 3.4. Running unit tests
+## 3.5. Running unit tests
 
 To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
 
@@ -96,7 +122,7 @@ To execute unit tests with the [Karma](https://karma-runner.github.io) test runn
 ng test
 ```
 
-## 3.5. Running end-to-end tests
+## 3.6. Running end-to-end tests
 
 For end-to-end (e2e) testing, run:
 
@@ -106,6 +132,6 @@ ng e2e
 
 Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
-## 3.6. Additional Resources
+## 3.7. Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
