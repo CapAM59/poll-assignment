@@ -1,1 +1,44 @@
-<p>survey-admin works!</p>
+<section>
+    <p-card header="Survey Administration" class="survey-admin-container">
+        <form [formGroup]="surveyForm" formControlName="title" (ngSubmit)="onSubmit()">
+            <div class="form-field">
+                <label for="pollTitle">Poll Title</label>
+                <input id="pollTitle" type="text" required placeholder="Enter the poll title" formControlName="title"
+                    pInputText class="w-full" />
+            </div>
+            <small class="p-error" *ngIf="surveyForm.get('title')?.invalid && surveyForm.get('title')?.touched">
+                Poll title is required.
+            </small>
+
+            <div class="questions-section" formArrayName="questions">
+                <h3>Questions</h3>
+
+                <div *ngFor="let question of questions.controls; let i = index" [formGroupName]="i"
+                    class="question-row">
+                    <div class="question-input-wrapper">
+                        <label [for]="'question-' + i">Question {{ i + 1 }} *</label>
+                        <div class="question-controls">
+                            <input [id]="'question-' + i" type="text" required pInputText formControlName="title"
+                                placeholder="Enter your question here" class="question-input" />
+                            <p-button type="button" pButton icon="pi pi-trash" class="p-button-danger p-button-sm"
+                                (click)="removeQuestionFromPoll(i)" (keydown.enter)="removeQuestionFromPoll(i)"
+                                [attr.aria-label]="'Remove question ' + (i + 1)"></p-button>
+                        </div>
+                    </div>
+                    <small class="p-error" *ngIf="question.get('title')?.invalid && question.get('title')?.touched">
+                        Question text is required.
+                    </small>
+
+                    <button type="button" label="Add question" icon="pi pi-plus" pButton class="p-button-secondary"
+                        (click)="addEmptyQuestionInPoll()">
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" label="Save Poll" icon="pi pi-save" pButton class="p-button-primary" [disabled]="surveyForm.invalid" (click)="onSubmit()">Save</button>
+                <button type="button" label="Reset" icon="pi pi-refresh" pButton class="p-button-outlined" (click)="resetForm()">Refresh</button>
+            </div>
+        </form>
+    </p-card>
+</section>
