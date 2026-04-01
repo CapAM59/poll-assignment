@@ -1,0 +1,46 @@
+.questions-section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.06rem;
+	margin-bottom: 1rem;
+}
+
+.question-row {
+	padding: 0.4rem 0.75rem;
+	border-radius: 0.5rem;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	margin-bottom: 0.05rem;
+}
+
+.question-controls {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.form-field label,
+.question-input-wrapper label {
+	display: inline-block;
+	margin-bottom: 0.35rem;
+}
+
+.form-actions {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 1rem;
+}
+
+.add-question-action {
+	display: block;
+	margin-left: auto;
+	margin-top: 0.5rem;
+}
+
+.add-question-action .p-button-icon {
+	margin-right: 0.45rem;
+}
+
+.question-count {
+	display: inline-block;
+	margin-top: 0.75rem;
+}

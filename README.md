@@ -1,21 +1,24 @@
 - [1. PollAssignment](#1-pollassignment)
   - [1.1. Roadmap](#11-roadmap)
   - [1.2. UI/UX](#12-uiux)
-    - [1.2.1. Admin's form](#121-admins-form)
-    - [1.2.2. Poll](#122-poll)
-    - [1.2.3. Results' view](#123-results-view)
+    - [1.2.1. Theme](#121-theme)
+    - [1.2.2. Admin's form](#122-admins-form)
+    - [1.2.3. Poll](#123-poll)
+    - [1.2.4. Results' view](#124-results-view)
 - [2. 🛠️ Stack](#2-️-stack)
 - [3. 🛢️ Database](#3-️-database)
   - [3.1. 🗺️ Schema](#31-️-schema)
-  - [3.2. 🌱 Seed Initialization](#32--seed-initialization)
-    - [3.2.1. How It Works](#321-how-it-works)
-    - [3.2.2. Implementation Details](#322-implementation-details)
-  - [3.3. 🗃️ Entities](#33-️-entities)
-    - [3.3.1. 🎭 Role](#331--role)
-    - [3.3.2. 👤 User](#332--user)
-    - [3.3.3. 📝 Poll](#333--poll)
-    - [3.3.4. ❓ Question](#334--question)
-    - [3.3.5. 💬 Answer](#335--answer)
+  - [3.2. 🗃️ Entities](#32-️-entities)
+    - [3.2.1. 🎭 Role](#321--role)
+    - [3.2.2. 👤 User](#322--user)
+    - [3.2.3. 📝 Poll](#323--poll)
+    - [3.2.4. ❓ Question](#324--question)
+    - [3.2.5. 💬 Answer](#325--answer)
+  - [3.3. 🌱 Seed Initialization](#33--seed-initialization)
+    - [3.3.1. Values](#331-values)
+      - [3.3.1.1. Roles](#3311-roles)
+    - [3.3.2. How It Works](#332-how-it-works)
+    - [3.3.3. Implementation Details](#333-implementation-details)
 - [4. Developper](#4-developper)
   - [4.1. Development server](#41-development-server)
   - [4.2. Building](#42-building)
@@ -41,13 +44,18 @@ PollAssignment is a local‑first single-page polling application written in Typ
 
 ## 1.2. UI/UX
 
-### 1.2.1. Admin's form
+### 1.2.1. Theme
+PrimeNG detects if your browser is in dark mod.
+
+### 1.2.2. Admin's form
 A minimum of 2 questions is mandatory and a maximum of 10 is setted.
-Warning : When refresh button is pressed, all the related information to your survey are erased ! In this order : first, the results, then, the displayed questions, then the poll itself. It is related to how the database's schema is.
+All fields are limited to 80 characters.
 
-### 1.2.2. Poll
+Warning : When the refresh button is pressed, all the related information to your survey are erased ! In this order : first, the results, then, the displayed questions, then the poll itself. It is related to how the database's schema is.
 
-### 1.2.3. Results' view
+### 1.2.3. Poll
+
+### 1.2.4. Results' view
 
 # 2. 🛠️ Stack
 
@@ -63,11 +71,48 @@ Database is stored in IndexedDB thanks to **idb wrapper**. Here its schema:
 
 ![databaseSchema](public/documentation/assets/databaseSchema.webp)
 
-## 3.2. 🌱 Seed Initialization
+## 3.2. 🗃️ Entities
+
+There are 5 entities :
+
+### 3.2.1. 🎭 Role
+- 🗝️ id: number;
+- label: string;
+
+### 3.2.2. 👤 User
+- 🗝️ id: number;
+- name: string;
+- 🗝️👽 roleid: number;
+
+### 3.2.3. 📝 Poll
+- 🗝️ id: number;
+- title: string;
+- 🗝️👽 userid: number;
+
+### 3.2.4. ❓ Question
+- 🗝️ id: number;
+- title: string;
+- 🗝️👽 pollid: number;
+
+### 3.2.5. 💬 Answer
+- 🗝️ id: number; 
+- vote: boolean; 
+- timestamp: Date; 
+- 🗝️👽 questionid: number; 
+- 🗝️👽 userid: number;
+
+## 3.3. 🌱 Seed Initialization
 
 When the application starts, a **seed service** automatically initializes the database with default roles if they don't already exist. This ensures the database is always in a valid state for the application to operate.
 
-### 3.2.1. How It Works
+### 3.3.1. Values
+
+#### 3.3.1.1. Roles
+There are two roles seeded at runtime.
+{label: 'Admin', id: 1}
+{label: 'User', id: 2}
+
+### 3.3.2. How It Works
 
 1. **Idempotent Initialization**: The seed runs only once per unique role. If a role with the same label already exists in the database, it is skipped.
 
@@ -79,42 +124,12 @@ When the application starts, a **seed service** automatically initializes the da
 
 4. **Error Handling**: If role creation fails, the error is logged but does not prevent the application from starting. Users can manually reseed the database if needed.
 
-### 3.2.2. Implementation Details
+### 3.3.3. Implementation Details
 
 - **Service**: [`src/app/db/seed/seed.service.ts`](src/app/db/seed/seed.service.ts)
 - **Seed Data**: [`src/app/db/seed/default-roles.seed.ts`](src/app/db/seed/default-roles.seed.ts)
 - **Configuration**: Integrated in [`src/app/app.config.ts`](src/app/app.config.ts)
 - **Tests**: Comprehensive unit tests in [`src/app/db/seed/seed.service.spec.ts`](src/app/db/seed/seed.service.spec.ts)
-
-## 3.3. 🗃️ Entities
-
-There are 5 entities :
-
-### 3.3.1. 🎭 Role
-- 🗝️ id: number;
-- label: string;
-
-### 3.3.2. 👤 User
-- 🗝️ id: number;
-- name: string;
-- 🗝️👽 roleid: number;
-
-### 3.3.3. 📝 Poll
-- 🗝️ id: number;
-- title: string;
-- 🗝️👽 userid: number;
-
-### 3.3.4. ❓ Question
-- 🗝️ id: number;
-- title: string;
-- 🗝️👽 pollid: number;
-
-### 3.3.5. 💬 Answer
-- 🗝️ id: number; 
-- vote: boolean; 
-- timestamp: Date; 
-- 🗝️👽 questionid: number; 
-- 🗝️👽 userid: number;
 
 # 4. Developper
 

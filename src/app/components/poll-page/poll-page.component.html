@@ -1,6 +1,13 @@
 <h1>Poll page</h1>
-<div>
-    <app-survey-admin></app-survey-admin>
-    <app-survey-probe></app-survey-probe>
-    <app-survey-results></app-survey-results>
+<div class="poll-page-container">
+    <div class="poll-admin">
+        <app-survey-admin></app-survey-admin>
+        <button type="button" label="Reset" icon="pi pi-refresh" pButton class="p-button-outlined"></button>
+    </div>
+    <div class="poll-probe">
+        <app-survey-probe></app-survey-probe>
+    </div>
+    <div class="poll-results">
+        <app-survey-results></app-survey-results>
+    </div>
 </div>

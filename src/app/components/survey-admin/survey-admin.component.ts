@@ -1,60 +1,143 @@
 import { Component } from '@angular/core';
 import { CardModule } from 'primeng/card';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
 import { Question } from '../../models/question.model';
 import { Poll } from '../../models/poll.model';
 import { PollService } from '../../services/poll.service';
 import { QuestionRepository } from '../../repositories/question.repository';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+
+const MIN_QUESTIONS = 2;
+const MAX_QUESTIONS = 10;
+
+function minQuestionsValidator(min: number): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const formArray = control as FormArray;
+    return formArray.length < min
+      ? { minQuestions: { required: min, actual: formArray.length } }
+      : null;
+  };
+}
 
 @Component({
   selector: 'app-survey-admin',
-  imports: [CardModule, ReactiveFormsModule, CommonModule, InputTextModule],
+  imports: [ButtonModule, CardModule, ReactiveFormsModule, CommonModule, InputTextModule, ToastModule],
   templateUrl: './survey-admin.component.html',
   styleUrls: ['./survey-admin.component.scss']
 })
 export class SurveyAdminComponent {
   surveyForm: FormGroup;
   private initialPollId?: number;
+  private initialUserId: number = 0;
   private initialQuestions: Question[] = [];
+  private readonly MAX_FIELD_LENGTH = 80;
+  readonly MIN_QUESTIONS = MIN_QUESTIONS;
+  readonly MAX_QUESTIONS = MAX_QUESTIONS;
+  readonly TEXT_VALIDATORS = [Validators.required, Validators.maxLength(this.MAX_FIELD_LENGTH)];
+  readonly QUESTIONS_ARRAY_VALIDATORS = [
+    minQuestionsValidator(this.MIN_QUESTIONS),
+    Validators.maxLength(this.MAX_QUESTIONS)
+  ];
 
   constructor(private readonly formBuilder: FormBuilder,
     private readonly pollService: PollService,
+    private readonly messageService: MessageService,
     private readonly questionRepository: QuestionRepository) {
     this.surveyForm = this.formBuilder.group({
-      title: ['', Validators.required],
-      questions: this.formBuilder.array([])
+      title: ['', this.TEXT_VALIDATORS],
+      questions: this.formBuilder.array(
+        this.createInitialQuestions(),
+        this.QUESTIONS_ARRAY_VALIDATORS)
     });
   }
 
-  // ngOnInit()
+  private createInitialQuestions(): FormGroup<any>[] {
+    return Array.from({ length: this.MIN_QUESTIONS }, () => this.createQuestion());
+  }
 
+  get questions(): FormArray {
+    return this.surveyForm.get('questions') as FormArray;
+  }
 
+  get canSave(): boolean {
+    const filled = this.questions.controls
+      .filter(control => {
+        const title = control.get('title')?.value;
+        return title && title.trim() !== '';
+      }).length;
+    return filled >= this.MIN_QUESTIONS && this.surveyForm.get('title')?.valid === true;
+  }
 
   addEmptyQuestionInPoll(): void {
-    const questions = this.getQuestionsInPoll();
-    questions.push(this.createQuestion());
+    if (this.questions.length === this.MAX_QUESTIONS) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Maximum number of questions reached',
+        detail: 'You cannot add more than ' + this.MAX_QUESTIONS + ' questions to a poll.',
+        life: 3000
+      })
+      return;
+    }
+    this.questions.push(this.createQuestion());
   }
 
   removeQuestionFromPoll(index: number): void {
-    const questions = this.getQuestionsInPoll();
-    questions.removeAt(index);
-  }
-
-  private getQuestionsInPoll(): FormArray {
-    return this.surveyForm.get('questions') as FormArray;
+    if (this.questions.length === this.MIN_QUESTIONS) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Minimum number of questions required',
+        detail: 'A poll must have at least ' + this.MIN_QUESTIONS + ' questions.',
+        life: 3000
+      })
+      return;
+    }
+    this.questions.removeAt(index);
   }
 
   private createQuestion(question?: Partial<Question>): FormGroup {
     return this.formBuilder.group({
       id: [question?.id],
-      title: [question?.title || '', Validators.required],
+      title: [question?.title || '', this.TEXT_VALIDATORS],
       pollId: [question?.pollId]
     });
   }
 
+  resetForm(): void {
+    this.resetInitialVariables();
+    this.surveyForm.reset();
+    (this.surveyForm.get('questions') as FormArray).clear();
+    this.createInitialQuestions().forEach(questionForm => this.questions.push(questionForm));
+  }
+
+  private stripEmptyQuestions(): void {
+    const emptyIndices = this.questions.controls
+      .map((control, index) => ({ index, title: control.get('title')?.value }))
+      .filter(({ title }) => !title || title.trim() === '')
+      .map(({ index }) => index)
+      .reverse();
+    emptyIndices.forEach(index => this.questions.removeAt(index));
+  }
+
+  private resetInitialVariables(): void {
+    this.initialPollId = undefined;
+    this.initialUserId = 0;
+    this.initialQuestions = [];
+  }
+
   async onSubmit(): Promise<void> {
+    this.stripEmptyQuestions();
+    this.surveyForm.markAllAsTouched();
+
+    this.alertOnQuestionSize();
+
+    if (this.surveyForm.invalid) {
+      return;
+    }
+
     const pollId = this.initialPollId
       ? await this.updatePoll()
       : await this.createPoll();
@@ -66,6 +149,17 @@ export class SurveyAdminComponent {
 
     if (updatedPoll && updatedQuestions) {
       this.loadPoll(updatedPoll, updatedQuestions);
+    }
+  }
+
+  private alertOnQuestionSize(): void {
+    if (this.questions.length < this.MIN_QUESTIONS) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Not enough questions',
+        detail: `Please fill in at least ${this.MIN_QUESTIONS} questions before saving.`,
+        life: 4000
+      });
     }
   }
 
@@ -85,7 +179,7 @@ export class SurveyAdminComponent {
     const pollToUpdate: Poll = {
       id: this.initialPollId!,
       title: formValue.title,
-      userId: formValue.userId
+      userId: this.initialUserId
     };
     await this.pollService.update(pollToUpdate);
     console.log('Poll updated');
@@ -98,20 +192,21 @@ export class SurveyAdminComponent {
     this.loadQuestions(questions);
   }
 
-  private setInitialVariables(poll: Poll, questions: Question[]) {
+  private setInitialVariables(poll: Poll, questions: Question[]): void {
     this.initialPollId = poll.id;
+    this.initialUserId = poll.userId;
     this.initialQuestions = questions;
   }
 
-  private loadQuestions(questions: Question[]) {
-    const questionsArray = this.getQuestionsInPoll();
-    questionsArray.clear();
+  private loadQuestions(questions: Question[]): void {
+    this.questions.clear();
     questions.forEach(question => {
-      questionsArray.push(this.createQuestion(question));
+      this.questions.push(this.createQuestion(question));
     });
   }
 
   private async saveFormQuestions(pollId: number): Promise<void> {
+    // Strategy Pattern
     await this.deleteUnusedQuestionsFromRepository();
     await this.updatedEditedQuestionsInRepository();
     await this.createQuestionsInRepository(pollId);
@@ -125,12 +220,12 @@ export class SurveyAdminComponent {
   }
 
   private getQuestionsToDelete(): number[] {
-    const formQuestionsIds = this.getQuestionsInPoll().controls
+    const formQuestionsIds = new Set(this.questions.controls
       .map(control => control.get('id')?.value)
-      .filter((id: number | undefined): id is number => id !== undefined);
+      .filter((id: number | undefined): id is number => id != null));
     return this.initialQuestions
       .map(question => question.id)
-      .filter(id => !formQuestionsIds.includes(id));
+      .filter(id => !formQuestionsIds.has(id));
   }
 
   private async updatedEditedQuestionsInRepository() {
@@ -141,7 +236,7 @@ export class SurveyAdminComponent {
   }
 
   private getQuestionsToUpdate(): Question[] {
-    const formQuestions = this.getQuestionsInPoll().controls
+    const formQuestions = this.questions.controls
       .map(control => ({
         id: control.get('id')?.value,
         title: control.get('title')?.value,
@@ -175,23 +270,16 @@ export class SurveyAdminComponent {
   }
 
   private getQuestionsToCreate(): { title: string }[] {
-    const formQuestions = this.getQuestionsInPoll().controls
+    const formQuestions = this.questions.controls
       .map(control => ({
         id: control.get('id')?.value,
         title: control.get('title')?.value,
       }))
       .filter((formQuestion): formQuestion is { id: undefined, title: string } =>
-        formQuestion.id === undefined &&
-        formQuestion.title !== undefined);
+        formQuestion.id == null &&
+        formQuestion.title != null);
     return formQuestions.map(formQuestion => ({
       title: formQuestion.title
     }));
-  }
-
-  resetForm(): void {
-    this.initialPollId = undefined;
-    this.initialQuestions = [];
-    this.surveyForm.reset();
-    (this.surveyForm.get('questions') as FormArray).clear();
   }
 }
