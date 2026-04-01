@@ -1,1 +1,49 @@
-<p>survey-admin works!</p>
+<p-toast></p-toast>
+
+<section>
+    <p-card header="Survey Administration" class="survey-admin-container">
+        <form [formGroup]="surveyForm" (ngSubmit)="onSubmit()">
+            <div class="form-field">
+                <label for="pollTitle">Poll Title</label>
+                <input id="pollTitle" type="text" required placeholder="Enter the poll title" formControlName="title"
+                    pInputText class="w-full" />
+            </div>
+            <small class="p-error" *ngIf="surveyForm.get('title')?.invalid && surveyForm.get('title')?.touched">
+                Poll title is required.
+            </small>
+
+            <div class="questions-section" formArrayName="questions">
+                <h3>Questions</h3>
+
+                <div *ngFor="let question of questions.controls; let i = index" [formGroupName]="i"
+                    class="question-row">
+                    <div class="question-input-wrapper">
+                        <label [for]="'question-' + i">Question {{ i + 1 }} *</label>
+                        <div class="question-controls">
+                            <input [id]="'question-' + i" type="text" required pInputText formControlName="title"
+                                placeholder="Enter your question here" class="question-input" />
+                            <p-button type="button" icon="pi pi-trash" severity="danger" size="small"
+                                (click)="removeQuestionFromPoll(i)" (keydown.enter)="removeQuestionFromPoll(i)"
+                                [attr.aria-label]="'Remove question ' + (i + 1)"
+                                [disabled]="questions.length <= MIN_QUESTIONS">
+                            </p-button>
+                        </div>
+                    </div>
+                    <small class="p-error" *ngIf="question.get('title')?.invalid && question.get('title')?.touched">
+                        Question text is required.
+                    </small>
+                </div>
+            </div>
+
+            <button type="button" label="Add question" icon="pi pi-plus" pButton class="p-button-secondary add-question-action"
+                (click)="addEmptyQuestionInPoll()" [disabled]="questions.length >= MAX_QUESTIONS">
+            </button>
+
+            <div class="form-actions">
+                <button type="submit" label="Save" icon="pi pi-save" [disabled]="!canSave" pButton
+                    class="p-button-primary"></button>
+            </div>
+        </form>
+        <span class="question-count">{{ questions.length }} / {{ MAX_QUESTIONS }} questions</span>
+    </p-card>
+</section>
