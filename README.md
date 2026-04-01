@@ -1,10 +1,13 @@
 - [1. PollAssignment](#1-pollassignment)
-  - [1.1. Roadmap](#11-roadmap)
+  - [1.1. Roadmap / Backlog](#11-roadmap--backlog)
+    - [1.1.1. By Components and priority](#111-by-components-and-priority)
+    - [1.1.2. By Features](#112-by-features)
   - [1.2. UI/UX](#12-uiux)
-    - [1.2.1. Theme](#121-theme)
-    - [1.2.2. Admin's form](#122-admins-form)
-    - [1.2.3. Poll](#123-poll)
-    - [1.2.4. Results' view](#124-results-view)
+    - [1.2.1. Actual main screen](#121-actual-main-screen)
+    - [1.2.2. Theme](#122-theme)
+    - [1.2.3. Admin's form](#123-admins-form)
+    - [1.2.4. Poll](#124-poll)
+    - [1.2.5. Results' view](#125-results-view)
 - [2. 🛠️ Stack](#2-️-stack)
 - [3. 🛢️ Database](#3-️-database)
   - [3.1. 🗺️ Schema](#31-️-schema)
@@ -33,29 +36,49 @@
 
 PollAssignment is a local‑first single-page polling application written in Typescript.
 
-## 1.1. Roadmap
-- HTML Admin
-  - Retirer les boutons
-- HTML / ts : Poll
-- HTML / ts : Results
-- HTML / ts : global
-- User management : Authentification CRUD
-- SOLID
+## 1.1. Roadmap / Backlog
+
+### 1.1.1. By Components and priority
+- Survey-Probe
+  - HTML
+    - Display question
+  - TS : Manage the entier process
+- Survey-Results
+- Poll-page
+  - Refresh button must delete current poll and childs questions and theirs childs answers
+  - Highlight with border the focused panel or/and Shadow others
+- Survey-Admin
+  - Block access to user != admin
+  - Remove save button in favor of autosave
+  - a bit of CSS
+
+### 1.1.2. By Features
+- User management
+  - Seeds
+  - Authentification topleft icon menu
+  - for Poll-Page, grant access only for Admin
+  - Admin user CRUD management page
+- SOLID Classes
 
 ## 1.2. UI/UX
 
-### 1.2.1. Theme
+### 1.2.1. Actual main screen
+
+Here a screenshot of PollAssigment :
+
+
+### 1.2.2. Theme
 PrimeNG detects if your browser is in dark mod.
 
-### 1.2.2. Admin's form
+### 1.2.3. Admin's form
 A minimum of 2 questions is mandatory and a maximum of 10 is setted.
 All fields are limited to 80 characters.
 
 Warning : When the refresh button is pressed, all the related information to your survey are erased ! In this order : first, the results, then, the displayed questions, then the poll itself. It is related to how the database's schema is.
 
-### 1.2.3. Poll
+### 1.2.4. Poll
 
-### 1.2.4. Results' view
+### 1.2.5. Results' view
 
 # 2. 🛠️ Stack
 
