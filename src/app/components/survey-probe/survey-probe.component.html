@@ -1,1 +1,33 @@
-<p>survey-probe works!</p>
+<p-toast></p-toast>
+
+<section>
+    <p-card header="Complete this survey please" class="survey-probe-container">
+        @if (hasActivePoll) {
+        <form [formGroup]="surveyProbeForm" (ngSubmit)="onSubmit()">
+            <h2>{{ currentPollContext()?.poll?.title }}</h2>
+
+            <div formArrayName="answers">
+                @for (control of answers.controls; track $index; let i = $index) {
+                <div [formGroupName]="i" class="question-row">
+                    <input
+                        type="checkbox"
+                        formControlName="vote"
+                        (change)="onVoteChange(i, $event)"
+                        [id]="'vote-' + i"
+                        class="round-checkbox" />
+                    <p>{{ control.get('questionTitle')?.value }}</p>
+                </div>
+                }
+            </div>
+
+            <button type="submit" [disabled]="!canSave" pButton label="Submit" icon="pi pi-check"
+                class="p-button-primary">
+            </button>
+        </form>
+        } @else {
+        <div class="empty-state">
+            No survey is available yet. Please ask the administrator to create a poll first.
+        </div>
+        }
+    </p-card>
+</section>

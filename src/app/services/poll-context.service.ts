@@ -11,7 +11,7 @@ export interface CurrentPollContext {
 export class PollContextService {
   private readonly currentPollSignal = signal<CurrentPollContext | undefined>(undefined);
 
-  getCurrentPoll = this.currentPollSignal.asReadonly();
+  getCurrentPollContext = this.currentPollSignal.asReadonly();
 
   setCurrentPoll(context: CurrentPollContext): void {
     this.currentPollSignal.set(context);
@@ -21,6 +21,3 @@ export class PollContextService {
     this.currentPollSignal.set(undefined);
   }
 }
-
-
-

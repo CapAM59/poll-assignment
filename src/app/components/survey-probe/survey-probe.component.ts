@@ -1,6 +1,7 @@
-import { Component, effect, Signal, OnInit } from '@angular/core';
+import { Component, effect, inject, Injector, OnInit, Signal } from '@angular/core';
 import { Toast } from "primeng/toast";
 import { Card } from "primeng/card";
+import { ButtonModule } from 'primeng/button';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { CurrentPollContext, PollContextService } from '../../services/poll-context.service';
 import { AnswerRepository } from '../../repositories/answer.repository';
@@ -22,12 +23,13 @@ function minAnswersValidator(min: number): ValidatorFn {
 
 @Component({
   selector: 'app-survey-probe',
-  imports: [ReactiveFormsModule, Toast, Card],
+  imports: [ReactiveFormsModule, Toast, Card, ButtonModule],
   templateUrl: './survey-probe.component.html',
   styleUrl: './survey-probe.component.scss'
 })
 export class SurveyProbeComponent implements OnInit {
-  surveyProbeForm!: FormGroup;
+  surveyProbeForm: FormGroup = new FormGroup({});
+  private readonly injector = inject(Injector);
   private readonly currentUserId: number = 0;
   readonly MIN_ANSWERS_REQUIRED = MIN_ANSWERS_REQUIRED;
   readonly minAnswersValidator = minAnswersValidator(MIN_ANSWERS_REQUIRED);
@@ -38,7 +40,12 @@ export class SurveyProbeComponent implements OnInit {
   }
 
   get canSave(): boolean {
-    return this.surveyProbeForm.valid && this.answers.length >= this.MIN_ANSWERS_REQUIRED;
+    return this.surveyProbeForm.valid;
+  }
+
+  get hasActivePoll(): boolean {
+    const context = this.currentPollContext();
+    return !!context?.poll && this.answers.length > 0;
   }
 
   constructor(
@@ -47,6 +54,10 @@ export class SurveyProbeComponent implements OnInit {
     private readonly messageService: MessageService,
     private readonly answerRepository: AnswerRepository) {
     this.currentPollContext = this.pollContextService.getCurrentPollContext;
+    this.surveyProbeForm = this.formBuilder.group({
+      pollId: [null],
+      answers: this.formBuilder.array([])
+    });
   }
 
   ngOnInit(): void {
@@ -62,9 +73,9 @@ export class SurveyProbeComponent implements OnInit {
       if (context) {
         this.generateAnswersFormGroup(pollId, questions);
       } else {
-        this.handleMissingCurrentPoll();
+        this.generateAnswersFormGroup(undefined, []);
       }
-    });
+    }, { injector: this.injector });
   }
 
   private generateAnswersFormGroup(pollId: number | undefined, currentQuestions: Question[]) {
@@ -77,15 +88,33 @@ export class SurveyProbeComponent implements OnInit {
   private buildAnswersFormArray(currentQuestions: Question[]): FormArray<FormGroup<any>> {
     return this.formBuilder.array(
       currentQuestions
-        .map((question) => this.createAnswerFormGroup(question)) || []
+        .map((question) => this.createAnswerFormGroup(question)) || [],
+      {
+        validators: [this.minAnswersValidator]
+      }
     );
+  }
+
+  onVoteChange(selectedIndex: number, event: Event): void {
+    const target = event.target as HTMLInputElement | null;
+    if (!target?.checked) {
+      return;
+    }
+
+    this.answers.controls.forEach((control, index) => {
+      if (index !== selectedIndex) {
+        control.get('vote')?.setValue(false, { emitEvent: false });
+      }
+    });
+
+    this.answers.updateValueAndValidity({ emitEvent: false });
   }
 
   private createAnswerFormGroup(question: Question): FormGroup {
     return this.formBuilder.group({
       questionId: [question.id],
       questionTitle: [question.title ?? ''],
-      vote: false,
+      vote: [null],
       userId: [this.currentUserId]
     });
   }
@@ -108,13 +137,14 @@ export class SurveyProbeComponent implements OnInit {
   private async createAnswersInRepository(): Promise<void> {
     const answersFormGroup = this.answers.controls.map(control => control.value);
     const answersToSave = this.mapToAnswer(answersFormGroup);
-    for (const answer of answersToSave) {
-      try {
+    try {
+      for (const answer of answersToSave) {
         await this.create(answer);
-      } catch (error) {
-        this.sendMessage('error', 'Save failed', `Failed to save your answer for question ${answer.questionId}. Please try again.`);
-        console.log(`Failed to save your answer for question ${answer.questionId}. Please try again.`, error);
       }
+      this.sendMessage('success', 'Answer saved', `Your answer has been saved.`);
+    } catch (error) {
+      this.sendMessage('error', 'Save failed', `Failed to save your answer. Please try again.`);
+      console.log(`Failed to save your answer. Please try again.`, error);
     }
   }
 
@@ -133,14 +163,9 @@ export class SurveyProbeComponent implements OnInit {
 
   private async create(answer: Omit<Answer, "id">) {
     await this.answerRepository.create(answer);
-    this.sendMessage('success', 'Answer saved', `Your answer for question ${answer.questionId} has been saved.`);
   }
 
   private sendMessage(severity: 'success' | 'error' | 'warn', summary: string, detail: string): void {
     this.messageService.add({ severity, summary, detail });
-  }
-
-  private handleMissingCurrentPoll(): void {
-    this.messageService.add({ severity: 'warn', summary: 'No active poll', detail: 'Please select a poll to participate in.' });
   }
 }
