@@ -2,6 +2,7 @@
   - [1.1. Roadmap / Backlog](#11-roadmap--backlog)
     - [1.1.1. By Components and priority](#111-by-components-and-priority)
     - [1.1.2. By Features](#112-by-features)
+    - [Unit Tests](#unit-tests)
   - [1.2. UI/UX](#12-uiux)
     - [1.2.1. Actual main screen](#121-actual-main-screen)
     - [1.2.2. Theme](#122-theme)
@@ -41,20 +42,28 @@ PollAssignment is a local‑first single-page polling application written in Typ
 
 ### 1.1.1. By Components and priority
 - Survey-Probe
-  - HTML
-    - Display question
-  - TS : Manage the entier process
+  - Display question
+  - Manage the entire process
   - Other type of poll : currently only radio button
-    - if text : add field comment in answer question
+    - DB : add field comment in answer question
+    - HTML
+      - manage different types of answer
+    - TS
+      - .ts : manage different types of answer
 - Survey-Results
-  - Create an effect on the signal of the AnswerContexteService
+  - Create an effect on the signal of the AnswerContextService
 - Poll-page
   - Refresh button must delete current poll and childs questions and theirs childs answers
   - Highlight with border the focused panel or/and Shadow others
+  - Authentification topleft icon menu
 - Survey-Admin
   - Block access to user != admin
   - Remove save button in favor of autosave
   - a bit of CSS
+- Admin user management
+  - Add a page to display the users and their role
+  - Add restricted access to admin
+  - Add CRUD methods
 
 ### 1.1.2. By Features
 - User management
@@ -64,11 +73,14 @@ PollAssignment is a local‑first single-page polling application written in Typ
   - Add Seeds
     - seed service
     - default-user
-  - Authentification topleft icon menu
-  - for Poll-Page, grant access only for Admin
-  - Form to create an account
-  - Admin user CRUD management page
-- SOLID Classes
+- Answer management
+  - Add "comment"field in
+    - mydb.ts IndexedDB 
+    - answer's model
+- Optimise every Classes to get solid
+
+### Unit Tests
+- Code all the units tests.
 
 ## 1.2. UI/UX
 
@@ -148,9 +160,9 @@ There are two roles seeded at runtime.
 {label: 'User', id: 2}
 
 #### Users
-Are epected :
-{name: 'Creator', password:admin, roleId: 1, id: 1}
-{name: 'User', roleId: 2, id: 2}
+Are expected but not implemented yet:
+{name: 'Editor', password:admin, roleId: 1, id: 1} : involves to add password in models and db.
+{name: 'Respondent', roleId: 2, id: 2}
 
 ### 3.3.2. How It Works
 
