@@ -1,14 +1,14 @@
 <p-toast></p-toast>
 
 <section>
-    <p-card header="Survey Administration" class="survey-admin-container">
-        <form [formGroup]="surveyForm" (ngSubmit)="onSubmit()">
+    <p-card header="Create your survey" class="survey-admin-container">
+        <form [formGroup]="surveyAdminForm" (ngSubmit)="onSubmit()">
             <div class="form-field">
-                <label for="pollTitle">Poll Title</label>
-                <input id="pollTitle" type="text" required placeholder="Enter the poll title" formControlName="title"
+                <label for="pollTitle">Poll Title *</label>
+                <input id="pollTitle" type="text" required placeholder="Enter the poll title here" formControlName="title"
                     pInputText class="w-full" />
             </div>
-            <small class="p-error" *ngIf="surveyForm.get('title')?.invalid && surveyForm.get('title')?.touched">
+            <small class="p-error" *ngIf="surveyAdminForm.get('title')?.invalid && surveyAdminForm.get('title')?.touched">
                 Poll title is required.
             </small>
 
@@ -21,12 +21,14 @@
                         <label [for]="'question-' + i">Question {{ i + 1 }} *</label>
                         <div class="question-controls">
                             <input [id]="'question-' + i" type="text" required pInputText formControlName="title"
+                                [maxlength]="MAX_FIELD_LENGTH"
                                 placeholder="Enter your question here" class="question-input" />
-                            <p-button type="button" icon="pi pi-trash" severity="danger" size="small"
+                            <button type="button" pButton icon="pi pi-trash"
+                                class="p-button-danger p-button-sm"
                                 (click)="removeQuestionFromPoll(i)" (keydown.enter)="removeQuestionFromPoll(i)"
                                 [attr.aria-label]="'Remove question ' + (i + 1)"
                                 [disabled]="questions.length <= MIN_QUESTIONS">
-                            </p-button>
+                            </button>
                         </div>
                     </div>
                     <small class="p-error" *ngIf="question.get('title')?.invalid && question.get('title')?.touched">

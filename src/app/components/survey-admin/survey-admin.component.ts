@@ -10,6 +10,7 @@ import { PollService } from '../../services/poll.service';
 import { QuestionRepository } from '../../repositories/question.repository';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { PollContextService } from '../../services/poll-context.service';
 
 const MIN_QUESTIONS = 2;
 const MAX_QUESTIONS = 10;
@@ -27,14 +28,14 @@ function minQuestionsValidator(min: number): ValidatorFn {
   selector: 'app-survey-admin',
   imports: [ButtonModule, CardModule, ReactiveFormsModule, CommonModule, InputTextModule, ToastModule],
   templateUrl: './survey-admin.component.html',
-  styleUrls: ['./survey-admin.component.scss']
+  styleUrl: './survey-admin.component.scss'
 })
 export class SurveyAdminComponent {
-  surveyForm: FormGroup;
+  surveyAdminForm: FormGroup;
   private initialPollId?: number;
   private initialUserId: number = 0;
   private initialQuestions: Question[] = [];
-  private readonly MAX_FIELD_LENGTH = 80;
+  readonly MAX_FIELD_LENGTH = 80;
   readonly MIN_QUESTIONS = MIN_QUESTIONS;
   readonly MAX_QUESTIONS = MAX_QUESTIONS;
   readonly TEXT_VALIDATORS = [Validators.required, Validators.maxLength(this.MAX_FIELD_LENGTH)];
@@ -46,21 +47,22 @@ export class SurveyAdminComponent {
   constructor(private readonly formBuilder: FormBuilder,
     private readonly pollService: PollService,
     private readonly messageService: MessageService,
+    private readonly pollContextService: PollContextService,
     private readonly questionRepository: QuestionRepository) {
-    this.surveyForm = this.formBuilder.group({
+    this.surveyAdminForm = this.formBuilder.group({
       title: ['', this.TEXT_VALIDATORS],
       questions: this.formBuilder.array(
-        this.createInitialQuestions(),
+        this.createQuestionFormGroup(),
         this.QUESTIONS_ARRAY_VALIDATORS)
     });
   }
 
-  private createInitialQuestions(): FormGroup<any>[] {
+  private createQuestionFormGroup(): FormGroup<any>[] {
     return Array.from({ length: this.MIN_QUESTIONS }, () => this.createQuestion());
   }
 
   get questions(): FormArray {
-    return this.surveyForm.get('questions') as FormArray;
+    return this.surveyAdminForm.get('questions') as FormArray;
   }
 
   get canSave(): boolean {
@@ -69,7 +71,7 @@ export class SurveyAdminComponent {
         const title = control.get('title')?.value;
         return title && title.trim() !== '';
       }).length;
-    return filled >= this.MIN_QUESTIONS && this.surveyForm.get('title')?.valid === true;
+    return filled >= this.MIN_QUESTIONS && this.surveyAdminForm.get('title')?.valid === true;
   }
 
   addEmptyQuestionInPoll(): void {
@@ -108,9 +110,9 @@ export class SurveyAdminComponent {
 
   resetForm(): void {
     this.resetInitialVariables();
-    this.surveyForm.reset();
-    (this.surveyForm.get('questions') as FormArray).clear();
-    this.createInitialQuestions().forEach(questionForm => this.questions.push(questionForm));
+    this.surveyAdminForm.reset();
+    (this.surveyAdminForm.get('questions') as FormArray).clear();
+    this.createQuestionFormGroup().forEach(questionForm => this.questions.push(questionForm));
   }
 
   private stripEmptyQuestions(): void {
@@ -130,11 +132,11 @@ export class SurveyAdminComponent {
 
   async onSubmit(): Promise<void> {
     this.stripEmptyQuestions();
-    this.surveyForm.markAllAsTouched();
+    this.surveyAdminForm.markAllAsTouched();
 
     this.alertOnQuestionSize();
 
-    if (this.surveyForm.invalid) {
+    if (this.surveyAdminForm.invalid) {
       return;
     }
 
@@ -143,6 +145,13 @@ export class SurveyAdminComponent {
       : await this.createPoll();
 
     await this.saveFormQuestions(pollId);
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Saved successfully',
+      detail: 'The poll and its questions have been saved.',
+      life: 4000
+    });
 
     const updatedPoll = await this.pollService.getById(pollId);
     const updatedQuestions = await this.questionRepository.getAllByPollId(pollId);
@@ -164,10 +173,10 @@ export class SurveyAdminComponent {
   }
 
   private async createPoll(): Promise<number> {
-    const formValue = this.surveyForm.value;
+    const formValue = this.surveyAdminForm.value;
     const poll: Omit<Poll, 'id'> = {
       title: formValue.title,
-      userId: 0 // TODO Replace userId with actual user ID from authentication context
+      userId: this.initialUserId
     };
     const pollId = await this.pollService.create(poll);
     console.log('Poll created');
@@ -175,7 +184,7 @@ export class SurveyAdminComponent {
   }
 
   private async updatePoll(): Promise<number> {
-    const formValue = this.surveyForm.value;
+    const formValue = this.surveyAdminForm.value;
     const pollToUpdate: Poll = {
       id: this.initialPollId!,
       title: formValue.title,
@@ -188,7 +197,8 @@ export class SurveyAdminComponent {
 
   loadPoll(poll: Poll, questions: Question[]): void {
     this.setInitialVariables(poll, questions);
-    this.surveyForm.patchValue({ title: poll.title });
+    this.pollContextService.setCurrentPoll({ poll, questions });
+    this.surveyAdminForm.patchValue({ title: poll.title });
     this.loadQuestions(questions);
   }
 
@@ -206,9 +216,8 @@ export class SurveyAdminComponent {
   }
 
   private async saveFormQuestions(pollId: number): Promise<void> {
-    // Strategy Pattern
     await this.deleteUnusedQuestionsFromRepository();
-    await this.updatedEditedQuestionsInRepository();
+    await this.updateModifiedQuestionsInRepository();
     await this.createQuestionsInRepository(pollId);
   }
 
@@ -228,7 +237,7 @@ export class SurveyAdminComponent {
       .filter(id => !formQuestionsIds.has(id));
   }
 
-  private async updatedEditedQuestionsInRepository() {
+  private async updateModifiedQuestionsInRepository() {
     const questionsToUpdate = this.getQuestionsToUpdate();
     for (const questionToUpdate of questionsToUpdate) {
       await this.questionRepository.update(questionToUpdate);
@@ -259,7 +268,7 @@ export class SurveyAdminComponent {
       });
   }
 
-  private async createQuestionsInRepository(pollId: number) {
+  private async createQuestionsInRepository(pollId: number): Promise<void> {
     const questionsToCreate = this.getQuestionsToCreate();
     for (const questionToCreate of questionsToCreate) {
       await this.questionRepository.create({

@@ -1,10 +1,14 @@
 - [1. PollAssignment](#1-pollassignment)
-  - [1.1. Roadmap](#11-roadmap)
+  - [1.1. Roadmap / Backlog](#11-roadmap--backlog)
+    - [1.1.1. By Components and priority](#111-by-components-and-priority)
+    - [1.1.2. By Features](#112-by-features)
+    - [Unit Tests](#unit-tests)
   - [1.2. UI/UX](#12-uiux)
-    - [1.2.1. Theme](#121-theme)
-    - [1.2.2. Admin's form](#122-admins-form)
-    - [1.2.3. Poll](#123-poll)
-    - [1.2.4. Results' view](#124-results-view)
+    - [1.2.1. Actual main screen](#121-actual-main-screen)
+    - [1.2.2. Theme](#122-theme)
+    - [1.2.3. Admin's form](#123-admins-form)
+    - [1.2.4. Poll](#124-poll)
+    - [1.2.5. Results' view](#125-results-view)
 - [2. 🛠️ Stack](#2-️-stack)
 - [3. 🛢️ Database](#3-️-database)
   - [3.1. 🗺️ Schema](#31-️-schema)
@@ -15,8 +19,9 @@
     - [3.2.4. ❓ Question](#324--question)
     - [3.2.5. 💬 Answer](#325--answer)
   - [3.3. 🌱 Seed Initialization](#33--seed-initialization)
-    - [3.3.1. Values](#331-values)
+    - [3.3.1. Seeds' values](#331-seeds-values)
       - [3.3.1.1. Roles](#3311-roles)
+      - [Users](#users)
     - [3.3.2. How It Works](#332-how-it-works)
     - [3.3.3. Implementation Details](#333-implementation-details)
 - [4. Developper](#4-developper)
@@ -33,29 +38,71 @@
 
 PollAssignment is a local‑first single-page polling application written in Typescript.
 
-## 1.1. Roadmap
-- HTML Admin
-  - Retirer les boutons
-- HTML / ts : Poll
-- HTML / ts : Results
-- HTML / ts : global
-- User management : Authentification CRUD
-- SOLID
+## 1.1. Roadmap / Backlog
+
+### 1.1.1. By Components and priority
+- Survey-Probe
+  - Display question
+  - Manage the entire process
+  - Other type of poll : currently only radio button
+    - DB : add field comment in answer question
+    - HTML
+      - manage different types of answer
+    - TS
+      - .ts : manage different types of answer
+- Survey-Results
+  - Create an effect on the signal of the AnswerContextService
+- Poll-page
+  - Refresh button must delete current poll and childs questions and theirs childs answers
+  - Highlight with border the focused panel or/and Shadow others
+  - Authentification topleft icon menu
+- Survey-Admin
+  - Block access to user != admin
+  - Remove save button in favor of autosave
+  - a bit of CSS
+- Admin user management
+  - Add a page to display the users and their role
+  - Add restricted access to admin
+  - Add CRUD methods
+
+### 1.1.2. By Features
+- User management
+  - Add "password" field in
+    - mydb.ts IndexedDB
+    - user's model
+  - Add Seeds
+    - seed service
+    - default-user
+- Answer management
+  - Add "comment"field in
+    - mydb.ts IndexedDB 
+    - answer's model
+- Optimise every Classes to get solid
+
+### Unit Tests
+- Code all the units tests.
 
 ## 1.2. UI/UX
 
-### 1.2.1. Theme
+### 1.2.1. Actual main screen
+
+Here a screenshot of PollAssigment :
+
+
+### 1.2.2. Theme
 PrimeNG detects if your browser is in dark mod.
 
-### 1.2.2. Admin's form
+### 1.2.3. Admin's form
 A minimum of 2 questions is mandatory and a maximum of 10 is setted.
 All fields are limited to 80 characters.
 
 Warning : When the refresh button is pressed, all the related information to your survey are erased ! In this order : first, the results, then, the displayed questions, then the poll itself. It is related to how the database's schema is.
 
-### 1.2.3. Poll
+Thanks to PollContextService, when a poll is created, it is shared through a signal.
 
-### 1.2.4. Results' view
+### 1.2.4. Poll
+
+### 1.2.5. Results' view
 
 # 2. 🛠️ Stack
 
@@ -105,12 +152,17 @@ There are 5 entities :
 
 When the application starts, a **seed service** automatically initializes the database with default roles if they don't already exist. This ensures the database is always in a valid state for the application to operate.
 
-### 3.3.1. Values
+### 3.3.1. Seeds' values
 
 #### 3.3.1.1. Roles
 There are two roles seeded at runtime.
 {label: 'Admin', id: 1}
 {label: 'User', id: 2}
+
+#### Users
+Are expected but not implemented yet:
+{name: 'Editor', password:admin, roleId: 1, id: 1} : involves to add password in models and db.
+{name: 'Respondent', roleId: 2, id: 2}
 
 ### 3.3.2. How It Works
 
