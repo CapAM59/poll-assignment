@@ -52,12 +52,12 @@ export class SurveyAdminComponent {
     this.surveyAdminForm = this.formBuilder.group({
       title: ['', this.TEXT_VALIDATORS],
       questions: this.formBuilder.array(
-        this.createInitialQuestions(),
+        this.createQuestionFormGroup(),
         this.QUESTIONS_ARRAY_VALIDATORS)
     });
   }
 
-  private createInitialQuestions(): FormGroup<any>[] {
+  private createQuestionFormGroup(): FormGroup<any>[] {
     return Array.from({ length: this.MIN_QUESTIONS }, () => this.createQuestion());
   }
 
@@ -112,7 +112,7 @@ export class SurveyAdminComponent {
     this.resetInitialVariables();
     this.surveyAdminForm.reset();
     (this.surveyAdminForm.get('questions') as FormArray).clear();
-    this.createInitialQuestions().forEach(questionForm => this.questions.push(questionForm));
+    this.createQuestionFormGroup().forEach(questionForm => this.questions.push(questionForm));
   }
 
   private stripEmptyQuestions(): void {
