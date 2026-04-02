@@ -31,7 +31,7 @@ function minQuestionsValidator(min: number): ValidatorFn {
   styleUrls: ['./survey-admin.component.scss']
 })
 export class SurveyAdminComponent {
-  surveyForm: FormGroup;
+  surveyAdminForm: FormGroup;
   private initialPollId?: number;
   private initialUserId: number = 0;
   private initialQuestions: Question[] = [];
@@ -49,7 +49,7 @@ export class SurveyAdminComponent {
     private readonly messageService: MessageService,
     private readonly pollContextService: PollContextService,
     private readonly questionRepository: QuestionRepository) {
-    this.surveyForm = this.formBuilder.group({
+    this.surveyAdminForm = this.formBuilder.group({
       title: ['', this.TEXT_VALIDATORS],
       questions: this.formBuilder.array(
         this.createInitialQuestions(),
@@ -62,7 +62,7 @@ export class SurveyAdminComponent {
   }
 
   get questions(): FormArray {
-    return this.surveyForm.get('questions') as FormArray;
+    return this.surveyAdminForm.get('questions') as FormArray;
   }
 
   get canSave(): boolean {
@@ -71,7 +71,7 @@ export class SurveyAdminComponent {
         const title = control.get('title')?.value;
         return title && title.trim() !== '';
       }).length;
-    return filled >= this.MIN_QUESTIONS && this.surveyForm.get('title')?.valid === true;
+    return filled >= this.MIN_QUESTIONS && this.surveyAdminForm.get('title')?.valid === true;
   }
 
   addEmptyQuestionInPoll(): void {
@@ -110,8 +110,8 @@ export class SurveyAdminComponent {
 
   resetForm(): void {
     this.resetInitialVariables();
-    this.surveyForm.reset();
-    (this.surveyForm.get('questions') as FormArray).clear();
+    this.surveyAdminForm.reset();
+    (this.surveyAdminForm.get('questions') as FormArray).clear();
     this.createInitialQuestions().forEach(questionForm => this.questions.push(questionForm));
   }
 
@@ -132,11 +132,11 @@ export class SurveyAdminComponent {
 
   async onSubmit(): Promise<void> {
     this.stripEmptyQuestions();
-    this.surveyForm.markAllAsTouched();
+    this.surveyAdminForm.markAllAsTouched();
 
     this.alertOnQuestionSize();
 
-    if (this.surveyForm.invalid) {
+    if (this.surveyAdminForm.invalid) {
       return;
     }
 
@@ -173,7 +173,7 @@ export class SurveyAdminComponent {
   }
 
   private async createPoll(): Promise<number> {
-    const formValue = this.surveyForm.value;
+    const formValue = this.surveyAdminForm.value;
     const poll: Omit<Poll, 'id'> = {
       title: formValue.title,
       userId: this.initialUserId
@@ -184,7 +184,7 @@ export class SurveyAdminComponent {
   }
 
   private async updatePoll(): Promise<number> {
-    const formValue = this.surveyForm.value;
+    const formValue = this.surveyAdminForm.value;
     const pollToUpdate: Poll = {
       id: this.initialPollId!,
       title: formValue.title,
@@ -198,7 +198,7 @@ export class SurveyAdminComponent {
   loadPoll(poll: Poll, questions: Question[]): void {
     this.setInitialVariables(poll, questions);
     this.pollContextService.setCurrentPoll({ poll, questions });
-    this.surveyForm.patchValue({ title: poll.title });
+    this.surveyAdminForm.patchValue({ title: poll.title });
     this.loadQuestions(questions);
   }
 

@@ -2,13 +2,13 @@
 
 <section>
     <p-card header="Create your survey" class="survey-admin-container">
-        <form [formGroup]="surveyForm" (ngSubmit)="onSubmit()">
+        <form [formGroup]="surveyAdminForm" (ngSubmit)="onSubmit()">
             <div class="form-field">
                 <label for="pollTitle">Poll Title *</label>
                 <input id="pollTitle" type="text" required placeholder="Enter the poll title here" formControlName="title"
                     pInputText class="w-full" />
             </div>
-            <small class="p-error" *ngIf="surveyForm.get('title')?.invalid && surveyForm.get('title')?.touched">
+            <small class="p-error" *ngIf="surveyAdminForm.get('title')?.invalid && surveyAdminForm.get('title')?.touched">
                 Poll title is required.
             </small>
 
