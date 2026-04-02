@@ -28,7 +28,7 @@ function minQuestionsValidator(min: number): ValidatorFn {
   selector: 'app-survey-admin',
   imports: [ButtonModule, CardModule, ReactiveFormsModule, CommonModule, InputTextModule, ToastModule],
   templateUrl: './survey-admin.component.html',
-  styleUrls: ['./survey-admin.component.scss']
+  styleUrl: './survey-admin.component.scss'
 })
 export class SurveyAdminComponent {
   surveyAdminForm: FormGroup;
