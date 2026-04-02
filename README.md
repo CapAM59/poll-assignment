@@ -18,8 +18,9 @@
     - [3.2.4. ❓ Question](#324--question)
     - [3.2.5. 💬 Answer](#325--answer)
   - [3.3. 🌱 Seed Initialization](#33--seed-initialization)
-    - [3.3.1. Values](#331-values)
+    - [3.3.1. Seeds' values](#331-seeds-values)
       - [3.3.1.1. Roles](#3311-roles)
+      - [Users](#users)
     - [3.3.2. How It Works](#332-how-it-works)
     - [3.3.3. Implementation Details](#333-implementation-details)
 - [4. Developper](#4-developper)
@@ -43,7 +44,10 @@ PollAssignment is a local‑first single-page polling application written in Typ
   - HTML
     - Display question
   - TS : Manage the entier process
+  - Other type of poll : currently only radio button
+    - if text : add field comment in answer question
 - Survey-Results
+  - Create an effect on the signal of the AnswerContexteService
 - Poll-page
   - Refresh button must delete current poll and childs questions and theirs childs answers
   - Highlight with border the focused panel or/and Shadow others
@@ -54,9 +58,15 @@ PollAssignment is a local‑first single-page polling application written in Typ
 
 ### 1.1.2. By Features
 - User management
-  - Seeds
+  - Add "password" field in
+    - mydb.ts IndexedDB
+    - user's model
+  - Add Seeds
+    - seed service
+    - default-user
   - Authentification topleft icon menu
   - for Poll-Page, grant access only for Admin
+  - Form to create an account
   - Admin user CRUD management page
 - SOLID Classes
 
@@ -75,6 +85,8 @@ A minimum of 2 questions is mandatory and a maximum of 10 is setted.
 All fields are limited to 80 characters.
 
 Warning : When the refresh button is pressed, all the related information to your survey are erased ! In this order : first, the results, then, the displayed questions, then the poll itself. It is related to how the database's schema is.
+
+Thanks to PollContextService, when a poll is created, it is shared through a signal.
 
 ### 1.2.4. Poll
 
@@ -128,12 +140,17 @@ There are 5 entities :
 
 When the application starts, a **seed service** automatically initializes the database with default roles if they don't already exist. This ensures the database is always in a valid state for the application to operate.
 
-### 3.3.1. Values
+### 3.3.1. Seeds' values
 
 #### 3.3.1.1. Roles
 There are two roles seeded at runtime.
 {label: 'Admin', id: 1}
 {label: 'User', id: 2}
+
+#### Users
+Are epected :
+{name: 'Creator', password:admin, roleId: 1, id: 1}
+{name: 'User', roleId: 2, id: 2}
 
 ### 3.3.2. How It Works
 
