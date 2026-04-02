@@ -10,6 +10,7 @@ import { PollService } from '../../services/poll.service';
 import { QuestionRepository } from '../../repositories/question.repository';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { PollContextService } from '../../services/poll-context.service';
 
 const MIN_QUESTIONS = 2;
 const MAX_QUESTIONS = 10;
@@ -34,7 +35,7 @@ export class SurveyAdminComponent {
   private initialPollId?: number;
   private initialUserId: number = 0;
   private initialQuestions: Question[] = [];
-  private readonly MAX_FIELD_LENGTH = 80;
+  readonly MAX_FIELD_LENGTH = 80;
   readonly MIN_QUESTIONS = MIN_QUESTIONS;
   readonly MAX_QUESTIONS = MAX_QUESTIONS;
   readonly TEXT_VALIDATORS = [Validators.required, Validators.maxLength(this.MAX_FIELD_LENGTH)];
@@ -46,6 +47,7 @@ export class SurveyAdminComponent {
   constructor(private readonly formBuilder: FormBuilder,
     private readonly pollService: PollService,
     private readonly messageService: MessageService,
+    private readonly pollContextService: PollContextService,
     private readonly questionRepository: QuestionRepository) {
     this.surveyForm = this.formBuilder.group({
       title: ['', this.TEXT_VALIDATORS],
@@ -144,6 +146,13 @@ export class SurveyAdminComponent {
 
     await this.saveFormQuestions(pollId);
 
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Saved successfully',
+      detail: 'The poll and its questions have been saved.',
+      life: 4000
+    });
+
     const updatedPoll = await this.pollService.getById(pollId);
     const updatedQuestions = await this.questionRepository.getAllByPollId(pollId);
 
@@ -167,7 +176,7 @@ export class SurveyAdminComponent {
     const formValue = this.surveyForm.value;
     const poll: Omit<Poll, 'id'> = {
       title: formValue.title,
-      userId: 0 // TODO Replace userId with actual user ID from authentication context
+      userId: this.initialUserId
     };
     const pollId = await this.pollService.create(poll);
     console.log('Poll created');
@@ -188,6 +197,7 @@ export class SurveyAdminComponent {
 
   loadPoll(poll: Poll, questions: Question[]): void {
     this.setInitialVariables(poll, questions);
+    this.pollContextService.setCurrentPoll({ poll, questions });
     this.surveyForm.patchValue({ title: poll.title });
     this.loadQuestions(questions);
   }
@@ -206,9 +216,8 @@ export class SurveyAdminComponent {
   }
 
   private async saveFormQuestions(pollId: number): Promise<void> {
-    // Strategy Pattern
     await this.deleteUnusedQuestionsFromRepository();
-    await this.updatedEditedQuestionsInRepository();
+    await this.updateModifiedQuestionsInRepository();
     await this.createQuestionsInRepository(pollId);
   }
 
@@ -228,7 +237,7 @@ export class SurveyAdminComponent {
       .filter(id => !formQuestionsIds.has(id));
   }
 
-  private async updatedEditedQuestionsInRepository() {
+  private async updateModifiedQuestionsInRepository() {
     const questionsToUpdate = this.getQuestionsToUpdate();
     for (const questionToUpdate of questionsToUpdate) {
       await this.questionRepository.update(questionToUpdate);
