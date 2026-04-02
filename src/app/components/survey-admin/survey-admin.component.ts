@@ -268,7 +268,7 @@ export class SurveyAdminComponent {
       });
   }
 
-  private async createQuestionsInRepository(pollId: number) {
+  private async createQuestionsInRepository(pollId: number): Promise<void> {
     const questionsToCreate = this.getQuestionsToCreate();
     for (const questionToCreate of questionsToCreate) {
       await this.questionRepository.create({
