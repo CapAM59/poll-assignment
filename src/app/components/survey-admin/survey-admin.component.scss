@@ -23,7 +23,21 @@
 
 .form-field + .p-error {
 	display: block;
-	text-align: center;
+	text-align: left;
+	max-width: 760px;
+	width: 100%;
+	margin: 0.25rem auto 0;
+}
+
+.p-error {
+	color: #dc3545;
+	font-weight: 500;
+}
+
+.question-row .p-error {
+	display: block;
+	text-align: left;
+	margin-top: 0.25rem;
 }
 
 .questions-section {
@@ -88,4 +102,5 @@
 .question-count {
 	display: inline-block;
 	margin-top: 0.75rem;
+	margin-left: 0.75rem;
 }
