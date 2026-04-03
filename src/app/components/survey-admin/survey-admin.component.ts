@@ -49,7 +49,11 @@ export class SurveyAdminComponent {
     private readonly messageService: MessageService,
     private readonly pollContextService: PollContextService,
     private readonly questionRepository: QuestionRepository) {
-    this.surveyAdminForm = this.formBuilder.group({
+    this.surveyAdminForm = this.createEmptyForm();
+  }
+
+  private createEmptyForm(): FormGroup {
+    return this.formBuilder.group({
       title: ['', this.TEXT_VALIDATORS],
       questions: this.formBuilder.array(
         this.createQuestionFormGroup(),
@@ -76,12 +80,12 @@ export class SurveyAdminComponent {
 
   addEmptyQuestionInPoll(): void {
     if (this.questions.length === this.MAX_QUESTIONS) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Maximum number of questions reached',
-        detail: 'You cannot add more than ' + this.MAX_QUESTIONS + ' questions to a poll.',
-        life: 3000
-      })
+      this.sendMessage(
+        'warn',
+        'Maximum number of questions reached',
+        'You cannot add more than ' + this.MAX_QUESTIONS + ' questions to a poll.',
+        3000
+      );
       return;
     }
     this.questions.push(this.createQuestion());
@@ -89,15 +93,39 @@ export class SurveyAdminComponent {
 
   removeQuestionFromPoll(index: number): void {
     if (this.questions.length === this.MIN_QUESTIONS) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Minimum number of questions required',
-        detail: 'A poll must have at least ' + this.MIN_QUESTIONS + ' questions.',
-        life: 3000
-      })
+      this.sendMessage(
+        'warn',
+        'Minimum number of questions required',
+        'A poll must have at least ' + this.MIN_QUESTIONS + ' questions.',
+        3000
+      );
       return;
     }
     this.questions.removeAt(index);
+    this.refreshPollContextAfterQuestionRemoval();
+  }
+
+  private refreshPollContextAfterQuestionRemoval(): void {
+    if (!this.initialPollId) {
+      return;
+    }
+
+    const pollId = this.initialPollId;
+
+    const pollTitle = this.surveyAdminForm.get('title')?.value ?? '';
+    const poll: Poll = {
+      id: pollId,
+      title: pollTitle,
+      userId: this.initialUserId
+    };
+
+    const questions: Question[] = this.questions.controls.map((control) => ({
+      id: control.get('id')?.value,
+      title: control.get('title')?.value ?? '',
+      pollId
+    }));
+
+    this.pollContextService.setCurrentPoll({ poll, questions });
   }
 
   private createQuestion(question?: Partial<Question>): FormGroup {
@@ -110,9 +138,13 @@ export class SurveyAdminComponent {
 
   resetForm(): void {
     this.resetInitialVariables();
-    this.surveyAdminForm.reset();
-    (this.surveyAdminForm.get('questions') as FormArray).clear();
-    this.createQuestionFormGroup().forEach(questionForm => this.questions.push(questionForm));
+    this.pollContextService.clearCurrentPoll();
+    this.surveyAdminForm = this.createEmptyForm();
+    this.surveyAdminForm.markAsPristine();
+    this.surveyAdminForm.markAsUntouched();
+    this.surveyAdminForm.updateValueAndValidity();
+
+    this.sendMessage('info', 'Form reset', 'The survey form has been reset.', 2500);
   }
 
   private stripEmptyQuestions(): void {
@@ -128,6 +160,15 @@ export class SurveyAdminComponent {
     this.initialPollId = undefined;
     this.initialUserId = 0;
     this.initialQuestions = [];
+  }
+
+  private sendMessage(
+    severity: 'success' | 'info' | 'warn' | 'error',
+    summary: string,
+    detail: string,
+    life: number
+  ): void {
+    this.messageService.add({ severity, summary, detail, life });
   }
 
   async onSubmit(): Promise<void> {
@@ -146,12 +187,11 @@ export class SurveyAdminComponent {
 
     await this.saveFormQuestions(pollId);
 
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Saved successfully',
-      detail: 'The poll and its questions have been saved.',
-      life: 4000
-    });
+    this.sendMessage(
+      'success', 
+      'Saved successfully', 
+      'The poll and its questions have been saved.',
+       4000);
 
     const updatedPoll = await this.pollService.getById(pollId);
     const updatedQuestions = await this.questionRepository.getAllByPollId(pollId);
@@ -163,12 +203,12 @@ export class SurveyAdminComponent {
 
   private alertOnQuestionSize(): void {
     if (this.questions.length < this.MIN_QUESTIONS) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Not enough questions',
-        detail: `Please fill in at least ${this.MIN_QUESTIONS} questions before saving.`,
-        life: 4000
-      });
+      this.sendMessage(
+        'error',
+        'Not enough questions',
+        `Please fill in at least ${this.MIN_QUESTIONS} questions before saving.`,
+        4000
+      );
     }
   }
 
