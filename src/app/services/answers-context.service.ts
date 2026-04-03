@@ -1,4 +1,9 @@
 import { Injectable, signal } from '@angular/core';
+import { Answer } from '../models/answer.model';
+
+export interface CurrentAnswersContext {
+    answers: Answer[];
+}
 
 @Injectable({ providedIn: 'root' })
 export class AnswersContextService {
