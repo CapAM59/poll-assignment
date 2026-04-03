@@ -5,7 +5,9 @@
         <form [formGroup]="surveyAdminForm" (ngSubmit)="onSubmit()">
             <div class="form-field">
                 <label for="pollTitle">Poll Title *</label>
-                <input id="pollTitle" type="text" required placeholder="Enter the poll title here" formControlName="title"
+                <input id="pollTitle" type="text" required 
+                    [maxlength]="MAX_FIELD_LENGTH"
+                    placeholder="Enter the poll title here" formControlName="title"
                     pInputText class="w-full" />
             </div>
             <small class="p-error" *ngIf="surveyAdminForm.get('title')?.invalid && surveyAdminForm.get('title')?.touched">

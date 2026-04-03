@@ -10,12 +10,15 @@
 .form-field {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	align-items: stretch;
+	max-width: 760px;
+	width: 100%;
+	margin: 0 auto;
 }
 
 .form-field input {
 	width: 100%;
-	max-width: 620px;
+	max-width: 100%;
 }
 
 .form-field + .p-error {
