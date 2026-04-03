@@ -1,7 +1,7 @@
 - [1. PollAssignment](#1-pollassignment)
   - [1.1. Roadmap / Backlog](#11-roadmap--backlog)
     - [1.1.1. Priorities by components](#111-priorities-by-components)
-    - [Unit Tests](#unit-tests)
+    - [1.1.2. Unit Tests](#112-unit-tests)
   - [1.2. UI/UX](#12-uiux)
     - [1.2.1. Actual main screen](#121-actual-main-screen)
     - [1.2.2. Theme](#122-theme)
@@ -20,7 +20,7 @@
   - [3.3. 🌱 Seed Initialization](#33--seed-initialization)
     - [3.3.1. Seeds' values](#331-seeds-values)
       - [3.3.1.1. Roles](#3311-roles)
-      - [Users](#users)
+      - [3.3.1.2. Users](#3312-users)
     - [3.3.2. How It Works](#332-how-it-works)
     - [3.3.3. Implementation Details](#333-implementation-details)
 - [4. Developper](#4-developper)
@@ -67,7 +67,7 @@ PollAssignment is a local‑first single-page polling application written in Typ
     - answer's model
 - Optimise every Classes to reach SOLID
 
-### Unit Tests
+### 1.1.2. Unit Tests
 - Code all the units tests.
 
 ## 1.2. UI/UX
@@ -153,7 +153,7 @@ There are two roles seeded at runtime.
 {label: 'Admin', id: 1}
 {label: 'User', id: 2}
 
-#### Users
+#### 3.3.1.2. Users
 Are expected but not implemented yet:
 {name: 'Editor', password:admin, roleId: 1, id: 1} : involves to add password in models and db.
 {name: 'Respondent', roleId: 2, id: 2}
