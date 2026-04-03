@@ -86,7 +86,7 @@ PollAssignment is a local‑first single-page polling application written in Typ
 
 ### 1.2.1. Actual main screen
 
-Here a screenshot of PollAssigment :
+Here a screenshot of PollAssigment in a browser setted with a dark theme :
 
 
 ### 1.2.2. Theme
@@ -94,13 +94,14 @@ PrimeNG detects if your browser is in dark mod.
 
 ### 1.2.3. Admin's form
 A minimum of 2 questions is mandatory and a maximum of 10 is setted.
-All fields are limited to 80 characters.
+All fields (title and questions) are limited to 80 characters.
 
 Warning : When the refresh button is pressed, all the related information to your survey are erased ! In this order : first, the results, then, the displayed questions, then the poll itself. It is related to how the database's schema is.
 
 Thanks to PollContextService, when a poll is created, it is shared through a signal.
 
 ### 1.2.4. Poll
+Currently, user can only submit a single answer with a radio button (true/false)
 
 ### 1.2.5. Results' view
 
