@@ -1,0 +1,29 @@
+.poll-page-container {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	width: 100%;
+	min-height: calc(100vh - 120px);
+	align-items: flex-start;
+}
+
+.poll-admin,
+.poll-probe,
+.poll-results {
+	flex: 1 1 320px;
+	min-width: 0;
+}
+
+.poll-admin > *,
+.poll-probe > *,
+.poll-results > * {
+	display: block;
+	width: 100%;
+}
+
+@media (max-width: 1100px) {
+	.poll-page-container {
+		flex-direction: column;
+		min-height: auto;
+	}
+}

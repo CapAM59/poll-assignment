@@ -1,0 +1,106 @@
+.survey-admin-container form {
+	max-width: 760px;
+	margin: 0 auto;
+}
+
+:host ::ng-deep .survey-admin-container .p-card-title {
+	text-align: center;
+}
+
+.form-field {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	max-width: 760px;
+	width: 100%;
+	margin: 0 auto;
+}
+
+.form-field input {
+	width: 100%;
+	max-width: 100%;
+}
+
+.form-field + .p-error {
+	display: block;
+	text-align: left;
+	max-width: 760px;
+	width: 100%;
+	margin: 0.25rem auto 0;
+}
+
+.p-error {
+	color: #dc3545;
+	font-weight: 500;
+}
+
+.question-row .p-error {
+	display: block;
+	text-align: left;
+	margin-top: 0.25rem;
+}
+
+.questions-section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.06rem;
+	max-width: 760px;
+	width: 100%;
+	margin: 0 auto 1rem;
+
+	h3 {
+		text-align: center;
+	}
+}
+
+.question-row {
+	padding: 0.4rem 0.75rem;
+	border-radius: 0.5rem;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	margin-bottom: 0.05rem;
+}
+
+.question-controls {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.question-input {
+	flex: 1;
+}
+
+.question-controls button {
+	margin-left: auto;
+}
+
+.form-field label,
+.question-input-wrapper label {
+	display: inline-block;
+	margin-bottom: 0.35rem;
+}
+
+.form-actions {
+	display: flex;
+	justify-content: flex-end;
+	max-width: 760px;
+	width: 100%;
+	margin: 1rem auto 0;
+}
+
+.add-question-action {
+	display: block;
+	margin-left: auto;
+	margin-right: 0;
+	margin-top: 0.5rem;
+}
+
+.add-question-action .p-button-icon {
+	margin-right: 0.45rem;
+}
+
+.question-count {
+	display: inline-block;
+	margin-top: 0.75rem;
+	margin-left: 0.75rem;
+}
