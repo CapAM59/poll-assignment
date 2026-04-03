@@ -1,6 +1,30 @@
+:host {
+	display: block;
+	width: 100%;
+}
+
+section,
+.survey-results-container,
+.chart-container {
+	width: 100%;
+}
+
+.chart-container {
+	overflow-x: auto;
+}
+
 .empty-state {
 	text-align: center;
 	padding: 1rem;
 	color: #6c757d;
 	font-size: 1rem;
+	line-height: 1.4;
+	word-break: break-word;
+}
+
+@media (max-width: 768px) {
+	.empty-state {
+		font-size: 0.9rem;
+		padding: 0.75rem;
+	}
 }
