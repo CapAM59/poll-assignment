@@ -4,6 +4,7 @@ import { Card } from "primeng/card";
 import { ButtonModule } from 'primeng/button';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { CurrentPollContext, PollContextService } from '../../services/poll-context.service';
+import { AnswersContextService } from '../../services/answers-context.service';
 import { AnswerRepository } from '../../repositories/answer.repository';
 import { MessageService } from 'primeng/api';
 import { Answer } from '../../models/answer.model';
@@ -51,6 +52,7 @@ export class SurveyProbeComponent implements OnInit {
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly pollContextService: PollContextService,
+    private readonly answersContextService: AnswersContextService,
     private readonly messageService: MessageService,
     private readonly answerRepository: AnswerRepository) {
     this.currentPollContext = this.pollContextService.getCurrentPollContext;
@@ -141,6 +143,7 @@ export class SurveyProbeComponent implements OnInit {
       for (const answer of answersToSave) {
         await this.create(answer);
       }
+      this.answersContextService.notifyWhenAnswerAdded();
       this.sendMessage('success', 'Answer saved', `Your answer has been saved.`);
     } catch (error) {
       this.sendMessage('error', 'Save failed', `Failed to save your answer. Please try again.`);
