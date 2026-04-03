@@ -115,7 +115,7 @@ export class SurveyProbeComponent implements OnInit {
   private createAnswerFormGroup(question: Question): FormGroup {
     return this.formBuilder.group({
       questionId: [question.id],
-      questionTitle: [question.title ?? ''],
+      questionTitle: [(question.title ?? '').trim()],
       vote: [false],
       userId: [this.currentUserId]
     });
