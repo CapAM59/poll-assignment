@@ -114,7 +114,7 @@ export class SurveyProbeComponent implements OnInit {
     return this.formBuilder.group({
       questionId: [question.id],
       questionTitle: [question.title ?? ''],
-      vote: [null],
+      vote: [false],
       userId: [this.currentUserId]
     });
   }
@@ -149,7 +149,7 @@ export class SurveyProbeComponent implements OnInit {
   }
 
   private resetBooleanVotes(): void {
-    this.answers.controls.forEach(control => control.patchValue({ vote: false }));
+    this.answers.controls.forEach(control => control.patchValue({ vote: false }, { emitEvent: false }));
   }
 
   private mapToAnswer(answersFormGroup: any[]): Omit<Answer, 'id'>[] {
