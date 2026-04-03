@@ -38,7 +38,12 @@ export class SurveyAdminComponent {
   readonly MAX_FIELD_LENGTH = 80;
   readonly MIN_QUESTIONS = MIN_QUESTIONS;
   readonly MAX_QUESTIONS = MAX_QUESTIONS;
-  readonly TEXT_VALIDATORS = [Validators.required, Validators.maxLength(this.MAX_FIELD_LENGTH)];
+  readonly UTF8_PATTERN = /^[\p{L}\p{N}\s\-().,!?'":;]*$/u;
+  readonly TEXT_VALIDATORS = [
+    Validators.required,
+    Validators.maxLength(this.MAX_FIELD_LENGTH),
+    Validators.pattern(this.UTF8_PATTERN)
+  ];
   readonly QUESTIONS_ARRAY_VALIDATORS = [
     minQuestionsValidator(this.MIN_QUESTIONS),
     Validators.maxLength(this.MAX_QUESTIONS)
@@ -156,6 +161,20 @@ export class SurveyAdminComponent {
     emptyIndices.forEach(index => this.questions.removeAt(index));
   }
 
+  private trimAllFields(): void {
+    const titleControl = this.surveyAdminForm.get('title');
+    if (titleControl?.value) {
+      titleControl.setValue(titleControl.value.trim(), { emitEvent: false });
+    }
+
+    this.questions.controls.forEach(control => {
+      const questionTitleControl = control.get('title');
+      if (questionTitleControl?.value) {
+        questionTitleControl.setValue(questionTitleControl.value.trim(), { emitEvent: false });
+      }
+    });
+  }
+
   private resetInitialVariables(): void {
     this.initialPollId = undefined;
     this.initialUserId = 0;
@@ -172,6 +191,7 @@ export class SurveyAdminComponent {
   }
 
   async onSubmit(): Promise<void> {
+    this.trimAllFields();
     this.stripEmptyQuestions();
     this.surveyAdminForm.markAllAsTouched();
 
