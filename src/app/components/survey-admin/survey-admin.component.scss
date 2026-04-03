@@ -1,3 +1,13 @@
+:host {
+	display: block;
+	width: 100%;
+}
+
+section,
+.survey-admin-container {
+	width: 100%;
+}
+
 .survey-admin-container form {
 	max-width: 760px;
 	margin: 0 auto;
@@ -32,6 +42,8 @@
 .p-error {
 	color: #dc3545;
 	font-weight: 500;
+	line-height: 1.35;
+	word-break: break-word;
 }
 
 .question-row .p-error {
@@ -103,4 +115,32 @@
 	display: inline-block;
 	margin-top: 0.75rem;
 	margin-left: 0.75rem;
+}
+
+@media (max-width: 768px) {
+	.survey-admin-container form,
+	.form-field,
+	.questions-section,
+	.form-actions {
+		max-width: 100%;
+	}
+
+	.question-controls {
+		flex-wrap: wrap;
+	}
+
+	.question-controls button {
+		margin-left: 0;
+	}
+
+	.form-field + .p-error,
+	.question-row .p-error {
+		font-size: 0.875rem;
+	}
+
+	.question-count {
+		display: block;
+		margin-left: 0;
+		margin-top: 0.5rem;
+	}
 }
