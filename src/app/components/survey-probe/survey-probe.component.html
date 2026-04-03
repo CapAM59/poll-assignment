@@ -1,7 +1,7 @@
 <p-toast></p-toast>
 
 <section>
-    <p-card header="Please, could you complete this survey :" class="survey-probe-container">
+    <p-card header="Please, could you complete this survey ? :" class="survey-probe-container">
         @if (hasActivePoll) {
         <form [formGroup]="surveyProbeForm" (ngSubmit)="onSubmit()">
             <h2>{{ currentPollContext()?.poll?.title }}</h2>
