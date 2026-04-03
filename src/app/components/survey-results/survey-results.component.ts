@@ -5,13 +5,15 @@ import { CurrentPollContext, PollContextService } from '../../services/poll-cont
 import { Answer } from '../../models/answer.model';
 import { Question } from '../../models/question.model';
 import { AnswerRepository } from '../../repositories/answer.repository';
+import { Card } from "primeng/card";
 
 
 @Component({
   selector: 'app-survey-results',
   imports: [
-    ChartModule
-  ],
+    ChartModule,
+    Card
+],
   templateUrl: './survey-results.component.html',
   styleUrl: './survey-results.component.scss'
 })
@@ -25,7 +27,7 @@ export class SurveyResultsComponent implements OnInit {
   get hasData(): boolean {
     return this.chartData?.datasets?.length > 0 && this.chartData?.labels;
   }
-  
+
   constructor(
     private readonly pollContextService: PollContextService,
     private readonly answersContextService: AnswersContextService,

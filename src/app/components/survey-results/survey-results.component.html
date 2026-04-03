@@ -1,1 +1,19 @@
-<p>survey-results works!</p>
+<!-- STEP 8 (à faire) :
+  - Entourer le tout dans un p-card avec un header "Results"
+  - Ajouter un @if (hasData) autour du p-chart pour n'afficher le graphique que si des données existent
+  - Ajouter un bloc @else avec un message "empty state" si aucun poll actif / aucune réponse
+-->
+<section>
+    <p-card header="Results" class="survey-results-container">
+        @if (!hasData) {
+        <div class="empty-state">
+            No data to display yet. Please ask the administrator to create a poll and submit some answers first.
+        </div>
+        }
+        @else {
+        <div class="chart-container">
+            <p-chart type="bar" [data]="chartData" [options]="chartOptions"></p-chart>
+        </div>
+        }
+    </p-card>
+</section>
