@@ -1,8 +1,7 @@
 - [1. PollAssignment](#1-pollassignment)
   - [1.1. Roadmap / Backlog](#11-roadmap--backlog)
-    - [1.1.1. By Components and priority](#111-by-components-and-priority)
-    - [1.1.2. By Features](#112-by-features)
-    - [Unit Tests](#unit-tests)
+    - [1.1.1. Priorities by components](#111-priorities-by-components)
+    - [1.1.2. Unit Tests](#112-unit-tests)
   - [1.2. UI/UX](#12-uiux)
     - [1.2.1. Actual main screen](#121-actual-main-screen)
     - [1.2.2. Theme](#122-theme)
@@ -21,7 +20,7 @@
   - [3.3. 🌱 Seed Initialization](#33--seed-initialization)
     - [3.3.1. Seeds' values](#331-seeds-values)
       - [3.3.1.1. Roles](#3311-roles)
-      - [Users](#users)
+      - [3.3.1.2. Users](#3312-users)
     - [3.3.2. How It Works](#332-how-it-works)
     - [3.3.3. Implementation Details](#333-implementation-details)
 - [4. Developper](#4-developper)
@@ -40,54 +39,48 @@ PollAssignment is a local‑first single-page polling application written in Typ
 
 ## 1.1. Roadmap / Backlog
 
-### 1.1.1. By Components and priority
-- Survey-Probe
-  - Display question
-  - Manage the entire process
-  - Other type of poll : currently only radio button
-    - DB : add field comment in answer question
-    - HTML
-      - manage different types of answer
-    - TS
-      - .ts : manage different types of answer
-- Survey-Results
-  - Create an effect on the signal of the AnswerContextService
-- Poll-page
-  - Refresh button must delete current poll and childs questions and theirs childs answers
-  - Highlight with border the focused panel or/and Shadow others
-  - Authentification topleft icon menu
+### 1.1.1. Priorities by components
+- User-management
+  - Feature : Authentification system
+    - Add "password" field in
+      - mydb.ts IndexedDB
+      - user's model
+    - Add Seeds to create "SuperUser" and "Manager" users
 - Survey-Admin
-  - Block access to user != admin
-  - Remove save button in favor of autosave
-  - a bit of CSS
-- Admin user management
-  - Add a page to display the users and their role
-  - Add restricted access to admin
-  - Add CRUD methods
-
-### 1.1.2. By Features
-- User management
-  - Add "password" field in
-    - mydb.ts IndexedDB
-    - user's model
-  - Add Seeds
-    - seed service
-    - default-user
+  - UI/UX : Block access to user != admin
+  - Feature : Remove save button in favor of autosave
+- Poll-page
+  - UX : Authentification topleft icon menu (a field to log and display the user and its role)
+  - UI : Highlight with border the focused panel and Shadow others
+- Survey-Probe
+  - Feature : Other type of poll : currently only radio button
+    - DB : add field comment in answer question
+      - .html : to manage different types of answer
+      - .ts : to manage different types of answer
+    - DN : update "vote:boolean" to be an array of boolean and then detecs how many are required from survey-poll = pollContextService
+- User-management
+  - UX : Add admin's page to display and manage users
+    - Feature : Add CRUD methods
 - Answer management
-  - Add "comment"field in
+  - To manage texts : Add "comment: string" field
     - mydb.ts IndexedDB 
     - answer's model
-- Optimise every Classes to get solid
+- Optimise every Classes to reach SOLID
 
-### Unit Tests
+### 1.1.2. Unit Tests
 - Code all the units tests.
 
 ## 1.2. UI/UX
 
 ### 1.2.1. Actual main screen
 
-Here a screenshot of PollAssigment in a browser setted with a dark theme :
+Here a screenshot of PollAssigment in a browser setted with a light theme.
+It is divided in three panels, from left to right : 
+- Admin's tab : "Create your survey"
+- Users' tab : "Please, could you complete this survey ?"
+- Chart's tab : "Results"
 
+![mainScreen](public/documentation/assets/mainScreen.png)
 
 ### 1.2.2. Theme
 PrimeNG detects if your browser is in dark mod.
@@ -160,7 +153,7 @@ There are two roles seeded at runtime.
 {label: 'Admin', id: 1}
 {label: 'User', id: 2}
 
-#### Users
+#### 3.3.1.2. Users
 Are expected but not implemented yet:
 {name: 'Editor', password:admin, roleId: 1, id: 1} : involves to add password in models and db.
 {name: 'Respondent', roleId: 2, id: 2}
